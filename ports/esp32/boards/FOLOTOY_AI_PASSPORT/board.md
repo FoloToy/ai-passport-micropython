@@ -126,14 +126,14 @@ drive. The firmware provides a small FAT filesystem and keeps the USB serial
 REPL available for file transfer instead:
 
 ```bash
-mpremote connect /dev/ttyACM0 cp main.py :main.py
+mpremote connect /dev/ttyACM0 resume fs cp main.py :main.py
 ```
 
 After reset, `/main.py` on the filesystem takes precedence over the frozen
 example. Remove the user file to restore the bundled application:
 
 ```bash
-mpremote connect /dev/ttyACM0 rm :main.py
+mpremote connect /dev/ttyACM0 resume fs rm :main.py
 ```
 
 This replaces only the user script and does not require reading back or
@@ -167,7 +167,7 @@ after reset. A manual import is only needed when restarting it from the REPL:
 import ai_passport_app
 ```
 
-The frozen `main.py` starts this application automatically after reset when no
+The bundled boot hook starts this application automatically after reset when no
 user file is present; a user file takes precedence. The shell is
 intentionally an application starting point: replace its pages with your own
 UI while keeping the reusable `ST7789LVGL`, `st7789`, `es8311`, and standard

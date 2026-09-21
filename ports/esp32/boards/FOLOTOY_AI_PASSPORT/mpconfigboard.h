@@ -4,7 +4,7 @@
 // Mount the user filesystem before boot.py/main.py are evaluated.  The normal
 // startup order then prefers a user-uploaded /main.py and falls back to the
 // frozen example when no user file exists.
-#define MICROPY_BOARD_FROZEN_BOOT_FILE      "_boot.py"
+#define MICROPY_BOARD_FROZEN_BOOT_FILE      "ai_passport_boot.py"
 
 // The board uses the native USB Serial/JTAG interface on GPIO18/19 for the
 // MicroPython REPL.  Define MICROPY_HW_ENABLE_UART_REPL in a local build when

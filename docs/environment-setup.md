@@ -19,7 +19,7 @@ $env:AI_PASSPORT_PORT = "COM3"
 python -m mpremote connect COM3 exec "print('MicroPython ready')"
 ```
 
-Then upload with `python -m mpremote connect COM3 fs cp .\main.py :main.py`. The Unix helper scripts in `tools/` are convenient on Linux/macOS and WSL; on native Windows use the equivalent `mpremote` command.
+Then upload with `python -m mpremote connect COM3 resume fs cp .\main.py :main.py`. The Unix helper scripts in `tools/` are convenient on Linux/macOS and WSL; on native Windows use the equivalent `mpremote` command.
 
 ## Custom firmware on Windows
 

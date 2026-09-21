@@ -1,5 +1,8 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/FoloToy/ai-passport/main/assets/images/logo-wordmark-dark.png" alt="FoloToy AI Passport" width="260">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/FoloToy/ai-passport/main/assets/images/logo-wordmark-dark.png">
+    <img src="https://raw.githubusercontent.com/FoloToy/ai-passport/main/assets/images/logo-wordmark.png" alt="FoloToy AI Passport" width="260">
+  </picture>
   <h1>FoloToy AI Passport MicroPython</h1>
   <p><strong>Wear it. Flash it. Make it anything.</strong></p>
   <p>人人都能使用的开放式可穿戴 AI 开发平台</p>

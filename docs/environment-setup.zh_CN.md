@@ -19,7 +19,7 @@ $env:AI_PASSPORT_PORT = "COM3"
 python -m mpremote connect COM3 exec "print('MicroPython ready')"
 ```
 
-上传示例：`python -m mpremote connect COM3 fs cp .\main.py :main.py`。`tools/` 下的 Unix 脚本适合 Linux、macOS 和 WSL，原生 Windows 使用等价的 `mpremote` 命令即可。
+上传示例：`python -m mpremote connect COM3 resume fs cp .\main.py :main.py`。`tools/` 下的 Unix 脚本适合 Linux、macOS 和 WSL，原生 Windows 使用等价的 `mpremote` 命令即可。
 
 ## Windows 上开发自定义固件
 
