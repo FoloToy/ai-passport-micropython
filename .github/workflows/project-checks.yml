@@ -1,0 +1,52 @@
+name: AI Passport project checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Docs, scripts, and examples
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Check shell scripts
+        shell: bash
+        run: bash -n tools/find_port.sh tools/upload_main.sh tools/remove_user_main.sh tools/device_info.sh tools/build_default_firmware.sh tools/flash_firmware.sh
+
+      - name: Check example Python syntax
+        run: python -m py_compile ports/esp32/boards/FOLOTOY_AI_PASSPORT/examples/*.py
+
+      - name: Check English and Chinese documentation pairs
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          files = [Path("README.md"), Path("AGENTS.md"), *Path("docs").glob("*.md")]
+          for path in files:
+              if path.name.endswith(".zh_CN.md"):
+                  continue
+              pair = path.with_name(path.stem + ".zh_CN.md")
+              if not pair.exists():
+                  raise SystemExit(f"missing Chinese pair: {path}")
+              if path.read_text(encoding="utf-8").count("```") % 2:
+                  raise SystemExit(f"unclosed Markdown fence: {path}")
+          print("Documentation pairs: PASS")
+          PY
