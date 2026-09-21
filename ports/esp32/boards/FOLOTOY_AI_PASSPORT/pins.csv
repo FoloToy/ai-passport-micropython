@@ -1,0 +1,16 @@
+# FoloToy AI Passport board aliases.
+# The aliases expose the board wiring without forcing applications to use a
+# particular display, audio, or battery driver.
+LCD_SCLK,GPIO8
+LCD_MOSI,GPIO9
+LCD_CS,GPIO1
+LCD_DC,GPIO20
+LCD_BL,GPIO21
+BUTTON_ADC,GPIO0
+I2C_SCL,GPIO7
+I2C_SDA,GPIO10
+ES8311_MCLK,GPIO6
+ES8311_BCLK,GPIO5
+ES8311_WS,GPIO3
+ES8311_DOUT,GPIO2
+ES8311_DIN,GPIO4

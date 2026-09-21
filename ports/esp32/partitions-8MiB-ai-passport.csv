@@ -1,0 +1,8 @@
+# AI Passport layout: NVS, PHY data, a factory application, and a large FAT
+# filesystem for user-uploaded main.py files. ESP32-C3 USB Serial/JTAG is not
+# a USB mass-storage controller; files are uploaded through the serial REPL.
+# Name,      Type, SubType, Offset,   Size,     Flags
+nvs,         data, nvs,     0x9000,   0x6000,
+phy_init,    data, phy,     0xF000,   0x1000,
+factory,     app,  factory, 0x10000,  0x2F0000,
+vfs,         data, fat,     0x300000,  0x500000,

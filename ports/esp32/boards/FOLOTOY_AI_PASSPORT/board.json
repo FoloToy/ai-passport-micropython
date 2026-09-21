@@ -1,0 +1,24 @@
+{
+    "deploy": [
+        "../deploy_nativeusb.md"
+    ],
+    "deploy_options": {
+        "flash_offset": "0"
+    },
+    "docs": "",
+    "features": [
+        "BLE",
+        "External Flash",
+        "USB-C",
+        "WiFi",
+        "I2C",
+        "SPI",
+        "I2S"
+    ],
+    "images": [],
+    "mcu": "esp32c3",
+    "product": "AI Passport",
+    "thumbnail": "",
+    "url": "https://github.com/FoloToy/ai-passport",
+    "vendor": "FoloToy"
+}

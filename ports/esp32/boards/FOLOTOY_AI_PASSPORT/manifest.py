@@ -1,0 +1,5 @@
+freeze("$(PORT_DIR)/modules")
+freeze("modules")
+module("ai_passport_app.py", base_path="examples")
+module("lvgl_demo.py", base_path="examples")
+module("main.py", base_path="examples")
