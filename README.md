@@ -9,7 +9,7 @@
 
   <a href="https://github.com/FoloToy/ai-passport-micropython/releases"><img src="https://img.shields.io/github/v/release/FoloToy/ai-passport-micropython?style=flat-square&label=firmware" alt="Firmware releases"></a>
   <a href="https://github.com/FoloToy/ai-passport-micropython/actions"><img src="https://img.shields.io/github/actions/workflow/status/FoloToy/ai-passport-micropython/release-firmware.yml?style=flat-square&label=build" alt="Build status"></a>
-  <a href="https://github.com/FoloToy/ai-passport-micropython/blob/main/LICENSE"><img src="https://img.shields.io/github/license/FoloToy/ai-passport-micropython?style=flat-square" alt="License"></a>
+  <a href="https://github.com/FoloToy/ai-passport-micropython/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="MIT License"></a>
 </div>
 
 <p align="center">
