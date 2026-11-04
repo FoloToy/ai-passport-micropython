@@ -73,8 +73,12 @@ endif()
 # CMake validates INTERFACE source paths during configure, while the binding
 # generator produces LV_MP during the build.  Keep a stale placeholder so
 # configure succeeds and force the custom command to regenerate it.
+# Use 1970-01-02, not 1970-01-01: make rejects a zero mtime as "timestamp out
+# of range", substitutes 2514-05-30, and then treats the placeholder as newer
+# than its dependencies, which silently skips the bindings and ships firmware
+# without the "lvgl" module.
 file(WRITE ${LV_MP} "/* LVGL MicroPython binding generated at build time. */\n")
-execute_process(COMMAND touch -t 197001010000 ${LV_MP})
+execute_process(COMMAND touch -t 197001020000 ${LV_MP})
 
 target_link_libraries(usermod_lvgl INTERFACE lvgl_interface)
 
