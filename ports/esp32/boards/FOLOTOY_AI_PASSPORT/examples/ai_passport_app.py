@@ -216,9 +216,26 @@ class PassportApp:
         footer.set_pos(8, 208)
         self._scan_kind = index
         lv.screen_load(root)
-        # Do not scan while the page is being entered.  The user presses OK
-        # after the page is visible, so LVGL remains responsive and the scan
-        # result cannot race screen construction.
+        # Scan as soon as the page is visible so the result rows fill in
+        # without an extra OK press.  The scan blocks for a couple of seconds,
+        # so it must run from a scheduled callback after LVGL has presented
+        # the page, not while the screen tree is being built.
+        try:
+            micropython.schedule(self._start_page_scan, index)
+        except RuntimeError:
+            pass
+
+    def _discard_press(self):
+        """Forget the in-flight OK press after a blocking scan.
+
+        WLAN.scan() and BLE scanning stall _poll() for a couple of seconds.
+        The release is detected only after the scan returns, so the measured
+        hold time would include the scan and a normal tap would look like a
+        long press, sending the user straight back to the launcher.
+        """
+        self.down_since = None
+        self.long_sent = False
+        self.last_key = 0
 
     def _reference_page(self, index):
         names = ("DISPLAY", "BUTTON / ADC", "AUDIO", "BATTERY",
@@ -314,23 +331,19 @@ class PassportApp:
                 label.set_size(160, 24); label.center()
             self._mascot(246)
         lv.screen_load(root)
-        if index == 4:
-            # Let LVGL present the page before the potentially slow scan.
-            try:
-                micropython.schedule(self._start_page_scan, 4)
-            except RuntimeError:
-                pass
-        elif index == 5:
-            try:
-                micropython.schedule(self._start_page_scan, 5)
-            except RuntimeError:
-                pass
 
     def _start_page_scan(self, index):
         if index == 4 and self.page == "WI-FI SCAN":
             self._wifi_scan()
         elif index == 5 and self.page == "BLUETOOTH LE":
             self._ble_scan()
+        else:
+            return
+        # The scan blocked _poll() for a couple of seconds, so the OK press
+        # that opened this page is released while nobody is polling.  Drop the
+        # half-finished press state; otherwise the delayed release is timed as
+        # a long press and the page closes again immediately.
+        self._discard_press()
 
     def _battery_reading(self):
         try:
@@ -432,6 +445,28 @@ class PassportApp:
                                       ("ES8311 can be suspended", INK),
                                       ("Press reset to wake", YELLOW)))
 
+    def _release_ble(self):
+        """Stop the BLE host so Wi-Fi can allocate its internal buffers.
+
+        The ESP32-C3 has no PSRAM, and a live NimBLE host plus the Wi-Fi
+        driver cannot both fit in internal RAM: whichever starts second fails
+        with EIO or "WiFi Out of Memory".  Only one radio session is needed at
+        a time for these scan pages.
+        """
+        if self.ble is None:
+            return
+        try:
+            self.ble.gap_scan(None)
+        except Exception:
+            pass
+        try:
+            self.ble.active(False)
+        except Exception:
+            pass
+        self.ble = None
+        import gc
+        gc.collect()
+
     def _wifi_scan(self):
         if self._wifi_busy:
             return
@@ -441,6 +476,8 @@ class PassportApp:
         if self.page_status:
             self.page_status.set_text("Scanning Wi-Fi...")
         try:
+            # Free the BLE host first; both radios cannot hold internal RAM.
+            self._release_ble()
             # WLAN.scan() must stay in the main MicroPython task.  Calling the
             # ESP32 network driver from _thread can race driver state and
             # reset the chip when entering this page or pressing OK.
@@ -550,11 +587,25 @@ class PassportApp:
         for index, label in enumerate(self.page_rows):
             label.set_text(visible[index] if index < len(visible) else "")
 
+    def _release_wifi(self):
+        """Stop the Wi-Fi driver so the BLE host can allocate its RAM."""
+        try:
+            import network
+            sta = network.WLAN(network.STA_IF)
+            if sta.active():
+                sta.active(False)
+        except Exception:
+            pass
+        import gc
+        gc.collect()
+
     def _ble_scan(self):
         try:
             import bluetooth
             self._ble_result_event = getattr(bluetooth, "_IRQ_SCAN_RESULT", 5)
             self._ble_done_event = getattr(bluetooth, "_IRQ_SCAN_DONE", 6)
+            # Free the Wi-Fi driver first; both radios cannot hold internal RAM.
+            self._release_wifi()
             if self.ble is None:
                 self.ble = bluetooth.BLE()
             else:
@@ -738,8 +789,10 @@ class PassportApp:
             self._render_ble_results()
         elif self.page == "WI-FI SCAN" and key == 3:
             self._wifi_scan()
+            self._discard_press()
         elif self.page == "BLUETOOTH LE" and key == 3:
             self._ble_scan()
+            self._discard_press()
         elif self.page == "LOW POWER" and key in (1, 2):
             self._set_low_power_mode(0 if key == 1 else 1)
         elif self.page == "LOW POWER" and key == 3:
